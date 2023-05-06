@@ -56,3 +56,16 @@ func Create(nome, descricao string, preco float64, quantidade int) {
 	insereDadosNoBanco.Exec(nome, descricao, preco, quantidade)
 	defer db.Close()
 }
+
+func DeleteById(id string) {
+	db := db.OpenConnection()
+
+	deleted, err := db.Prepare("delete from produtos where id=?")
+	if err != nil {
+		panic(err.Error())
+	}
+
+	deleted.Exec(id)
+
+	defer db.Close()
+}
