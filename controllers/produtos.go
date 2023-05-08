@@ -8,6 +8,7 @@ import (
 
 	"github.com/WeslleySanto/go-crie-uma-aplicacao-web/models"
 	produtoModels "github.com/WeslleySanto/go-crie-uma-aplicacao-web/models"
+	utils "github.com/WeslleySanto/go-crie-uma-aplicacao-web/utils"
 )
 
 var tmpl = template.Must(template.ParseGlob("templates/*.html"))
@@ -24,26 +25,13 @@ func Create(w http.ResponseWriter, r *http.Request) {
 }
 
 func Insert(w http.ResponseWriter, r *http.Request) {
-
-	if r.Method == "POST" {
+	if utils.IsPost(r) {
 		nome := r.FormValue("nome")
 		descricao := r.FormValue("descricao")
-		preco := r.FormValue("preco")
-		quantidade := r.FormValue("quantidade")
+		preco := utils.ConvertStringToFloat64(r.FormValue("preco"))
+		quantidade := utils.ConvertStringToInt(r.FormValue("quantidade"))
 
-		precoToFloat, err := strconv.ParseFloat(preco, 64)
-
-		if err != nil {
-			log.Println("Erro na conversão do preço:", err)
-		}
-
-		quantidadeToInt, err := strconv.Atoi(quantidade)
-
-		if err != nil {
-			log.Println("Erro na conversão do quantidade:", err)
-		}
-
-		models.Create(nome, descricao, precoToFloat, quantidadeToInt)
+		models.Create(nome, descricao, preco, quantidade)
 	}
 
 	http.Redirect(w, r, "/", 301)
@@ -64,29 +52,19 @@ func Edit(w http.ResponseWriter, r *http.Request) {
 }
 
 func Update(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
+	if utils.IsPost(r) {
 		id := r.FormValue("id")
 		nome := r.FormValue("nome")
 		descricao := r.FormValue("descricao")
-		preco := r.FormValue("preco")
-		quantidade := r.FormValue("quantidade")
+		preco := utils.ConvertStringToFloat64(r.FormValue("preco"))
+		quantidade := utils.ConvertStringToInt(r.FormValue("quantidade"))
 
 		idConvertidaParaInt, err := strconv.Atoi(id)
 		if err != nil {
 			log.Println("Erro na convesão do ID para int:", err)
 		}
 
-		precoConvertidoParaFloat, err := strconv.ParseFloat(preco, 64)
-		if err != nil {
-			log.Println("Erro na convesão do preço para float64:", err)
-		}
-
-		quantidadeConvertidaParaInt, err := strconv.Atoi(quantidade)
-		if err != nil {
-			log.Println("Erro na convesão da quantidade para int:", err)
-		}
-
-		produtoModels.AtualizaProduto(idConvertidaParaInt, nome, descricao, precoConvertidoParaFloat, quantidadeConvertidaParaInt)
+		produtoModels.AtualizaProduto(idConvertidaParaInt, nome, descricao, preco, quantidade)
 	}
 	http.Redirect(w, r, "/", 301)
 }
